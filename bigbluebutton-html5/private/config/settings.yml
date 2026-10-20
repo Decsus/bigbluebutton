@@ -927,7 +927,18 @@ public:
     #   echo cancellation in non-rtc audio streams
     localEchoTest:
       enabled: true
-      initialHearingState: true
+      # FALSE by default (was: true).
+      # The local echo test plays your own microphone back into your own
+      # speakers. With initialHearingState: true it starts AUTOMATICALLY the
+      # moment a microphone is selected, and the client has an async race
+      # (playEchoStream() awaits an RTCPeerConnection negotiation before
+      # attaching the mic to the #local-media element) that can re-attach the
+      # live mic AFTER the audio-settings modal has unmounted. The result is
+      # the moderator hearing their own voice echoed back for the rest of the
+      # meeting, with no way to stop it.
+      # With this false the feedback only plays if the user explicitly clicks
+      # "Start audio feedback", so the race can no longer be hit by accident.
+      initialHearingState: false
       useRtcLoopbackInChromium: true
       # delay: delay (seconds) to be added to the audio feedback return
       delay:
